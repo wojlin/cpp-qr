@@ -11,23 +11,26 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 # Add Google Test
 set(GTEST_ROOT ${CMAKE_SOURCE_DIR}/external/googletest)
 set(gtest_discover_tests_multi_config TRUE)
-include_directories(${GTEST_ROOT}/googletest/include ${GTEST_ROOT}/googlemock/include)
 add_subdirectory(${GTEST_ROOT} ${CMAKE_BINARY_DIR}/gtest)
 
-# Include directories
+# Main include directories
 include_directories(include)
 
-# Source files
+# Create a library from the source files
 file(GLOB SOURCES "src/*.cpp")
+add_library(${PROJECT_NAME}_lib ${SOURCES})
 
-# Executable target
+# Link Google Test with the library
+target_link_libraries(${PROJECT_NAME}_lib gtest gmock)
+
+# Create the main executable (optional if you have a main executable separate from tests)
 add_executable(${PROJECT_NAME} ${SOURCES})
-
-# Link Google Test
-target_link_libraries(CPP_QR gtest gmock)
+target_link_libraries(${PROJECT_NAME} ${PROJECT_NAME}_lib)
 
 # Add your tests
 enable_testing()
-add_executable(QRModeTests "test/test_qr_mode_selector.cpp")
-target_link_libraries(QRModeTests gtest gmock)
+add_executable(QRModeTests "test/unit/TestQrModeSelector.cpp")
+target_link_libraries(QRModeTests ${PROJECT_NAME}_lib gtest gmock)
+
+# Register the tests with CTest
 add_test(NAME QRModeTests COMMAND QRModeTests)

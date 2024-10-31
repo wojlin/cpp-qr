@@ -4,3 +4,6 @@ build/
 external/
 external/*
 /external/
+.vscode
+.vscode/
+.vscode/*
