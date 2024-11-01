@@ -29,8 +29,20 @@ target_link_libraries(${PROJECT_NAME} ${PROJECT_NAME}_lib)
 
 # Add your tests
 enable_testing()
-add_executable(QRModeTests "test/unit/TestQrModeSelector.cpp")
-target_link_libraries(QRModeTests ${PROJECT_NAME}_lib gtest gmock)
+file(GLOB TEST_SOURCES "test/unit/*.cpp")
+# Loop through each test file and add it as an executable and register it with CTest
+foreach(TEST_SRC ${TEST_SOURCES})
+    # Extract the name of the test without the directory or file extension
+    get_filename_component(TEST_NAME ${TEST_SRC} NAME_WE)
+    
+    # Add each test as an executable
+    add_executable(${TEST_NAME} ${TEST_SRC})
+    
+    # Link libraries to each test executable
+    target_link_libraries(${TEST_NAME} ${PROJECT_NAME}_lib gtest gmock)
+    
+    # Register each test with CTest
+    add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
+endforeach()
 
-# Register the tests with CTest
-add_test(NAME QRModeTests COMMAND QRModeTests)
+message(STATUS "Test files: ${TEST_SOURCES}")
